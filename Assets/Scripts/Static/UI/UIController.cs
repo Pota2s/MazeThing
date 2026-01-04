@@ -15,33 +15,20 @@ public class UIController : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         instance = this;
     }
 
     private void OnEnable()
     {
-        StartCoroutine(BindEvents());
-    }
-
-    private IEnumerator BindEvents()
-    {
-        yield return new WaitUntil(() => InputService.Instance != null);
-
-        InputService.Instance.OnPause += PauseGame;
         TimeService.OnPause += ShowEscapeMenu;
         TimeService.OnResume += HideEscapeMenu;
-
-        GameState.Instance.OnLevelEnd += ShowEndMenu;
     }
 
     private void OnDisable()
     {
-        InputService.Instance.OnPause -= PauseGame;
+        
         TimeService.OnPause -= ShowEscapeMenu;
         TimeService.OnResume -= HideEscapeMenu;
-
-        GameState.Instance.OnLevelEnd -= ShowEndMenu;
     }
 
     private void ShowEscapeMenu()
@@ -54,7 +41,7 @@ public class UIController : MonoBehaviour
         escapeMenu.SetActive(true);
     }
 
-    private void ShowEndMenu()
+    public void ShowEndMenu()
     {
         levelEndMenu.SetActive(true);
     }

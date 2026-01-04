@@ -27,7 +27,7 @@ public class LevelEndMenu : MonoBehaviour
         exitButton.onClick?.RemoveListener(GameState.Instance.ExitLevel);
     }
 
-    private void ShowMenu()
+    public void ShowMenu()
     {
         gameObject.SetActive(true);
     }

@@ -17,12 +17,14 @@ public class GameState : MonoBehaviour
         if (Instance != null)
         {
             Destroy(gameObject);
+            return;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
         playerData = new PlayerData();
 
         saveData = SaveService.LoadJSON();
+
     }
 
     public void StartLevel()
@@ -34,6 +36,7 @@ public class GameState : MonoBehaviour
 
     public void ExitLevel()
     {
+        print("Exitting level");
         SceneManager.LoadScene(1);
     }
 
@@ -46,6 +49,7 @@ public class GameState : MonoBehaviour
             saveData.largestMazeSolved = mazeSize;
         }
         mazeSize += mazeGrowth;
+        UIController.instance.ShowEndMenu();
         OnLevelEnd?.Invoke();
     }
 

@@ -10,6 +10,11 @@ public class TimeService
     public static event Action OnResume;
     public static event Action<float> OnTimeScaleChanged;
 
+    public static void Initialize()
+    {
+        InputService.Instance.OnPause += Toggle;
+    }
+
     public static void Pause()
     {
         SilentPause();

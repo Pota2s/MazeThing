@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class InputService : MonoBehaviour
 {
     public static InputService Instance { get; private set; }
+    
     public event Action OnInteract;
     public event Action OnPause;
 
@@ -20,12 +21,11 @@ public class InputService : MonoBehaviour
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        
+        Instance = this;
+        
 
         moveAction = new InputAction("Move", binding: "<Gamepad>/leftStick");
         moveAction.AddCompositeBinding("2DVector")
@@ -46,6 +46,8 @@ public class InputService : MonoBehaviour
         interactAction.AddBinding("<Keyboard>/space");
 
         pauseAction = new InputAction("Pause", binding: "<Keyboard>/escape");
+
+        TimeService.Initialize();
     }
 
     private void OnEnable()

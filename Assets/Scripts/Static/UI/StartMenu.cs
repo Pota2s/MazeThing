@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StartMenu : MonoBehaviour
@@ -7,6 +6,7 @@ public class StartMenu : MonoBehaviour
     [SerializeField] private Vector2IntInputField sizeField;
     [SerializeField] private Vector2IntInputField growthField;
     [SerializeField] private Button startButton;
+    [SerializeField] private Button exitButton;
 
     private const string mazeSize = "MazeSize";
     private const string mazeGrowth = "MazeGrowth";
@@ -27,6 +27,7 @@ public class StartMenu : MonoBehaviour
     void OnEnable()
     {
         startButton.onClick.AddListener(LoadGameScene);
+        exitButton.onClick.AddListener(Exit);
 
         sizeField.SetValue(GetVector2Int(mazeSize, sizeField.GetFallbackVector()));
         growthField.SetValue(GetVector2Int(mazeGrowth, growthField.GetFallbackVector()));
@@ -37,6 +38,7 @@ public class StartMenu : MonoBehaviour
     private void OnDisable()
     {
         startButton.onClick.RemoveListener(LoadGameScene);
+        exitButton.onClick.RemoveListener(Exit);
 
         sizeField.OnValueEdited -= OnSizeEdited;
         growthField.OnValueEdited -= OnGrowthEdited;
@@ -56,9 +58,17 @@ public class StartMenu : MonoBehaviour
     void LoadGameScene()
     {
         GameState gameState = GameState.Instance;
-        sizeField.GetValue(out gameState.mazeSize);
-        growthField.GetValue(out gameState.mazeGrowth);
+        sizeField.GetValue(out Vector2Int size);
+        growthField.GetValue(out Vector2Int growth);
+
+        gameState.mazeSize = size;
+        gameState.mazeGrowth = growth;
 
         gameState.StartLevel();
+    }
+
+    void Exit()
+    {
+        Application.Quit();
     }
 }
