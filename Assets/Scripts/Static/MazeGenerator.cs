@@ -1,10 +1,12 @@
+using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class MazeGenerator : MonoBehaviour
 {
-    public Vector2Int mazeSize = new (10, 10);
+    private Vector2Int mazeSize;
     private MazeGraph mazeGraph;
     [SerializeField] private Tilemap wallTilemap;
     [SerializeField] private Tilemap floorTilemap;
@@ -12,21 +14,27 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] private TileBase floor;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject exitPrefab;
+    [SerializeField] private List<GameObject> enemyPrefabs;
 
     private List<Cell> deadEnds;
-    void Awake()
-    {
-        mazeGraph = new MazeGraph(mazeSize);
-        deadEnds = new List<Cell>();
-    }
+
     private void Start()
     {
+        mazeSize = GameState.Instance.mazeSize;
+        mazeGraph = new MazeGraph(mazeSize);
+        deadEnds = new List<Cell>();
+
         RenderMaze();
         Cell start = deadEnds[Random.Range(0,deadEnds.Count - 1)];
-        Cell end = deadEnds[Random.Range(0, deadEnds.Count - 1)];
-    
-        Instantiate(playerPrefab, new Vector3(start.coordinates.x * 2 + 0.5f, start.coordinates.y * 2 + 0.5f, 0), Quaternion.identity);
-        Instantiate(exitPrefab, new Vector3(end.coordinates.x * 2 + 0.5f, end.coordinates.y * 2 + 0.5f, 0), Quaternion.identity);
+        Cell end;
+        do
+        {
+            end = deadEnds[Random.Range(0, deadEnds.Count - 1)];
+        } while (start == end);
+
+        Instantiate(playerPrefab, new Vector3(start.coordinates.x * 2, start.coordinates.y * 2, 0), Quaternion.identity);
+        Instantiate(exitPrefab, new Vector3(end.coordinates.x * 2, end.coordinates.y * 2, 0), Quaternion.identity);
+        SpawnEnemies();
     }
 
     void RenderMaze()
@@ -70,6 +78,7 @@ public class MazeGenerator : MonoBehaviour
 
     void CarveWalls()
     {
+        deadEnds.Clear();
         var cells = mazeGraph.cells.Values;
         foreach (Cell cell in cells)
         {
@@ -87,6 +96,34 @@ public class MazeGenerator : MonoBehaviour
                 wallTilemap.SetTile(wallPosition, null);
             }
         }
+
+    }
+
+    void SpawnEnemies()
+    {
+        if (enemyPrefabs.Count == 0) return;
+
+        var cells = mazeGraph.cells.Values.ToList();
+
+        for (int i = cells.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (cells[i], cells[j]) = (cells[j], cells[i]);
+        }
+
+        int min = Mathf.RoundToInt(cells.Count * 0.05f) + 1;
+        int max = Mathf.RoundToInt(cells.Count * 0.1f) + 1;
+
+        var enemyCells = cells.Take(Random.Range(min,max));
+
+        foreach(Cell cell in enemyCells)
+        {
+            Instantiate(
+                enemyPrefabs[Random.Range(0, enemyPrefabs.Count - 1)],
+                new Vector3(cell.coordinates.x * 2,cell.coordinates.y * 2 + 0.5f,0),
+                Quaternion.identity);
+        }
+
     }
 
 }

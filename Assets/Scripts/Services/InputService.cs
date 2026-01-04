@@ -5,12 +5,15 @@ using UnityEngine.InputSystem;
 public class InputService : MonoBehaviour
 {
     public static InputService Instance { get; private set; }
-    public Action onInteract;
+    public event Action OnInteract;
+    public event Action OnPause;
 
     public InputAction moveAction;
     public InputAction interactAction;
+    public InputAction pauseAction;
 
     private Action<InputAction.CallbackContext> interactCallback;
+    private Action<InputAction.CallbackContext> pauseCallback;
 
     private void Awake()
     {
@@ -41,23 +44,31 @@ public class InputService : MonoBehaviour
         interactAction = new InputAction("Interact", binding: "<Keyboard>/e");
         interactAction.AddBinding("<Gamepad>/buttonSouth");
         interactAction.AddBinding("<Keyboard>/space");
+
+        pauseAction = new InputAction("Pause", binding: "<Keyboard>/escape");
     }
 
     private void OnEnable()
     {
-        interactCallback = ctx => onInteract?.Invoke();
+        interactCallback = ctx => OnInteract?.Invoke();
+        pauseCallback = ctx => OnPause?.Invoke();
+
         interactAction.performed += interactCallback;
+        pauseAction.performed += pauseCallback;
 
         moveAction.Enable();
         interactAction.Enable();
+        pauseAction.Enable();
     }
 
     private void OnDisable()
     {
         interactAction.performed -= interactCallback;
+        pauseAction.performed -= pauseCallback;
 
         moveAction.Disable();
         interactAction.Disable();
+        pauseAction.Disable();
     }
 
     private Vector2 queuedMove;
