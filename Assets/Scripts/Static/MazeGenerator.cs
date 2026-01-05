@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,11 +24,11 @@ public class MazeGenerator : MonoBehaviour
         deadEnds = new List<Cell>();
 
         RenderMaze();
-        Cell start = deadEnds[Random.Range(0,deadEnds.Count - 1)];
+        Cell start = deadEnds[Random.Range(0,deadEnds.Count)];
         Cell end;
         do
         {
-            end = deadEnds[Random.Range(0, deadEnds.Count - 1)];
+            end = deadEnds[Random.Range(0, deadEnds.Count)];
         } while (start == end);
 
         Instantiate(playerPrefab, new Vector3(start.coordinates.x * 2, start.coordinates.y * 2, 0), Quaternion.identity);
@@ -119,7 +118,7 @@ public class MazeGenerator : MonoBehaviour
         foreach(Cell cell in enemyCells)
         {
             Instantiate(
-                enemyPrefabs[Random.Range(0, enemyPrefabs.Count - 1)],
+                enemyPrefabs[Random.Range(0, enemyPrefabs.Count)],
                 new Vector3(cell.coordinates.x * 2,cell.coordinates.y * 2 + 0.5f,0),
                 Quaternion.identity);
         }

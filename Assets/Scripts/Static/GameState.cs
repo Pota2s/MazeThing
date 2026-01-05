@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameState : MonoBehaviour
 {
+    public static event Action<GameState> OnInitialized;
     public static GameState Instance { get; private set; }
     public Vector2Int mazeSize = new (10,10);
     public Vector2Int mazeGrowth = new (2, 2);
@@ -24,20 +25,19 @@ public class GameState : MonoBehaviour
         playerData = new PlayerData();
 
         saveData = SaveService.LoadJSON();
-
+        OnInitialized?.Invoke(this);
     }
 
     public void StartLevel()
     {
-        SceneManager.LoadScene(0);
-        TimeService.SilentResume();
         playerData = new PlayerData();
+        SceneManager.LoadScene("GameScene");
+        TimeService.SilentResume();
     }
 
     public void ExitLevel()
     {
-        print("Exitting level");
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("StartScene");
     }
 
     public void EndLevel()
@@ -50,6 +50,7 @@ public class GameState : MonoBehaviour
         }
         mazeSize += mazeGrowth;
         UIController.instance.ShowEndMenu();
+        SaveService.SaveJSON(saveData);
         OnLevelEnd?.Invoke();
     }
 
